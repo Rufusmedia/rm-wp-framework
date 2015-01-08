@@ -8,6 +8,7 @@ size = require('gulp-size'),
 rename = require('gulp-rename'),
 imagemin = require('gulp-imagemin'),
 minifyCSS = require('gulp-minify-css'),
+livereload = require('gulp-livereload'),
 sass = require('gulp-sass');
 
 
@@ -35,14 +36,13 @@ gulp.task('pre-process', function(){
   gulp.src('./sass/style.scss')
   .pipe(watch(function(files) {
     return files.pipe(sass({errLogToConsole: true}))
-    //.pipe(size({gzip: false, showFiles: true}))
     .pipe(size({gzip: true, showFiles: true}))
     .pipe(gulp.dest('./'))
     .pipe(minifyCSS())
     .pipe(rename('style.min.css'))
-    //.pipe(size({gzip: false, showFiles: true}))
     .pipe(size({gzip: true, showFiles: true}))
     .pipe(gulp.dest('./'))
+    .pipe(livereload());
   }));
 });
 
@@ -50,6 +50,8 @@ gulp.task('pre-process', function(){
 DEFAULT TASK
 */
 gulp.task('default', ['pre-process'], function(){
+  livereload.listen();
   gulp.start('pre-process', 'minify-img');
   gulp.watch('sass/*.scss', ['pre-process']);
+  gulp.watch(['./*.php']).on('change', livereload.changed);
 });
